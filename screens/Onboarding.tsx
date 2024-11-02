@@ -58,7 +58,7 @@ const OnboardingScreen: React.FC = () => {
 
     navigation.reset({
         index: 0,
-        routes: [{ name: 'Welcome' }],
+        routes: [{ name: 'MainTabs' }],
     });
   };
 

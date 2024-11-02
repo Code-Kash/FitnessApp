@@ -1,24 +1,83 @@
 // App.tsx
-
 import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, View, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { MaterialIcons } from '@expo/vector-icons';
+import OnboardingScreen from './screens/Onboarding';
+import Settings from './screens/Settings';
+import Home from './screens/Home';
+import Sources from './screens/Sources';
+import Profile from './screens/Profile';
 
-import OnboardingScreen from './screens/OnboardingScreen';
-import WelcomeScreen from './screens/WelcomeScreen';
-import SettingsScreen from './screens/SettingsScreen';
-import Home from './screens/Home'; 
+const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
+// Define the tab navigator param list
+type TabParamList = {
+  HomeTab: undefined;
+  Sources: undefined;
+  Profile: undefined;
+};
 
 export type RootStackParamList = {
   Onboarding: undefined;
   Welcome: undefined;
-  Home: undefined; // Define Home route
+  MainTabs: undefined;
+  Home: undefined;
   Settings: undefined;
+  Sources: undefined;
+  Profile: undefined;
 };
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
+// Create a TabNavigator component
+const TabNavigator = () => {
+  return (
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarStyle: {
+          borderTopWidth: 1,
+          borderTopColor: '#EEEEEE',
+          paddingVertical: 5,
+        },
+        tabBarActiveTintColor: '#007AFF',
+        tabBarInactiveTintColor: '#666666',
+      }}
+    >
+      <Tab.Screen
+        name="HomeTab"
+        component={Home}
+        options={{
+          tabBarLabel: 'Home',
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="home" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Sources"
+        component={Sources}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="science" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={Profile}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <MaterialIcons name="person" size={size} color={color} />
+          ),
+        }}
+      />
+    </Tab.Navigator>
+  );
+};
 
 const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -37,7 +96,6 @@ const App: React.FC = () => {
         setIsLoading(false);
       }
     };
-
     checkOnboarding();
   }, []);
 
@@ -51,25 +109,20 @@ const App: React.FC = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName={hasOnboarded ? 'Home' : 'Onboarding'}>
+      <Stack.Navigator initialRouteName={hasOnboarded ? 'MainTabs' : 'Onboarding'}>
         <Stack.Screen
           name="Onboarding"
           component={OnboardingScreen}
           options={{ headerShown: false }}
         />
         <Stack.Screen
-          name="Welcome"
-          component={WelcomeScreen}
-          options={{ headerShown: false }}
-        />
-        <Stack.Screen
-          name="Home"
-          component={Home}
+          name="MainTabs"
+          component={TabNavigator}
           options={{ headerShown: false }}
         />
         <Stack.Screen
           name="Settings"
-          component={SettingsScreen}
+          component={Settings}
           options={{ title: 'Settings' }}
         />
       </Stack.Navigator>
